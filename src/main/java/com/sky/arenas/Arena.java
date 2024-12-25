@@ -8,12 +8,13 @@ public class Arena {
     private String name;
     private Location spawn1;
     private Location spawn2;
-    private List<Location> chestLocations = new ArrayList<>();
+    private List<Location> bedrockLocations;
 
     public Arena(String name, Location spawn1, Location spawn2) {
         this.name = name;
         this.spawn1 = spawn1;
         this.spawn2 = spawn2;
+        this.bedrockLocations = new ArrayList<>();
     }
 
     public String getName() {
@@ -28,11 +29,14 @@ public class Arena {
         return spawn2;
     }
 
-    public void addChestLocation(Location location) {
-        chestLocations.add(location);
+    public List<Location> getBedrockLocations() {
+        return bedrockLocations;
     }
 
-    public List<Location> getChestLocations() {
-        return chestLocations;
+    public void addBedrockLocation(Location location) {
+        bedrockLocations.add(location);
+    }
+
+    public void addChestLocation(Location location) {
     }
 }

@@ -1,19 +1,14 @@
 package com.sky;
 
 import com.sky.arenas.Arena;
-import com.sky.commands.JoinCommand;
-import com.sky.commands.CreateArenaCommand;
-import com.sky.commands.StartGameCommand;
-import com.sky.commands.EndGameCommand;
-import com.sky.commands.SelectKitCommand;
-import com.sky.commands.StatsCommand;
-import com.sky.commands.LeaderboardCommand;
+import com.sky.commands.*;
 import com.sky.gui.KitSelectionGUI;
 import com.sky.kits.Kit;
 import com.sky.teams.Team;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -35,12 +30,21 @@ public class SkyPlugin extends JavaPlugin {
     private StatisticsManager statisticsManager;
     private EventManager eventManager;
     private AchievementManager achievementManager;
-    private SkyScoreboardManager scoreboardManager; // Usar SkyScoreboardManager
+    private SkyScoreboardManager scoreboardManager;
+    private PlayerLevel playerLevel;  // Añadir PlayerLevel
+    private DailyRewardManager dailyRewardManager;  // Añadir DailyRewardManager
+    private EconomyManager economyManager;  // Añadir EconomyManager
+    private ShopManager shopManager;  // Añadir ShopManager
     private Location lobbyLocation;
 
     @Override
     public void onEnable() {
         saveDefaultConfig();
+        loadConfigurations();
+        this.playerLevel = new PlayerLevel(this);  // Inicializar PlayerLevel
+        this.dailyRewardManager = new DailyRewardManager(this);  // Inicializar DailyRewardManager
+        this.economyManager = new EconomyManager(this);  // Inicializar EconomyManager
+        this.shopManager = new ShopManager(this);  // Inicializar ShopManager
         getLogger().info("SkyWars ha sido habilitado");
         this.lobbyLocation = new Location(getServer().getWorld("world"), 0, 70, 0); // Definir la ubicación del lobby
         this.getCommand("join").setExecutor(new JoinCommand(this, lobbyLocation));
@@ -50,13 +54,15 @@ public class SkyPlugin extends JavaPlugin {
         this.getCommand("selectkit").setExecutor(new SelectKitCommand(this));
         this.getCommand("stats").setExecutor(new StatsCommand(this));
         this.getCommand("leaderboard").setExecutor(new LeaderboardCommand(this));
+        this.getCommand("claimdailyreward").setExecutor(new ClaimDailyRewardCommand(this, dailyRewardManager));
+        this.getCommand("buy").setExecutor(new BuyCommand(this, shopManager));
         this.chestManager = new ChestManager(this);
         this.gameManager = new GameManager(this);
         this.rewardManager = new RewardManager(this);
         this.statisticsManager = new StatisticsManager(this);
         this.achievementManager = new AchievementManager(this);
         this.eventManager = new EventManager(this);
-        this.scoreboardManager = new SkyScoreboardManager(this); // Inicializar SkyScoreboardManager
+        this.scoreboardManager = new SkyScoreboardManager(this);
 
         // Añadir ejemplo de arena
         arenas.add(new Arena("Arena1", new Location(getServer().getWorld("world"), 0, 64, 0), new Location(getServer().getWorld("world"), 100, 64, 100)));
@@ -92,6 +98,52 @@ public class SkyPlugin extends JavaPlugin {
     @Override
     public void onDisable() {
         getLogger().info("SkyWars ha sido deshabilitado");
+    }
+
+    private void loadConfigurations() {
+        FileConfiguration config = getConfig();
+
+        // Cargar opciones de configuración del juego
+        int minPlayers = config.getInt("game.minPlayers");
+        int countdown = config.getInt("game.countdown");
+        int killReward = config.getInt("game.rewards.kill");
+        int winReward = config.getInt("game.rewards.win");
+
+        // Configurar ubicaciones del lobby
+        lobbyLocation = new Location(
+                Bukkit.getWorld(config.getString("lobby.location.world")),
+                config.getDouble("lobby.location.x"),
+                config.getDouble("lobby.location.y"),
+                config.getDouble("lobby.location.z")
+        );
+
+        // Cargar configuraciones de arenas
+        for (String arenaName : config.getConfigurationSection("arenas").getKeys(false)) {
+            String worldName = config.getString("arenas." + arenaName + ".spawn1.world");
+            double x1 = config.getDouble("arenas." + arenaName + ".spawn1.x");
+            double y1 = config.getDouble("arenas." + arenaName + ".spawn1.y");
+            double z1 = config.getDouble("arenas." + arenaName + ".spawn1.z");
+            double x2 = config.getDouble("arenas." + arenaName + ".spawn2.x");
+            double y2 = config.getDouble("arenas." + arenaName + ".spawn2.y");
+            double z2 = config.getDouble("arenas." + arenaName + ".spawn2.z");
+
+            Location spawn1 = new Location(Bukkit.getWorld(worldName), x1, y1, z1);
+            Location spawn2 = new Location(Bukkit.getWorld(worldName), x2, y2, z2);
+
+            arenas.add(new Arena(arenaName, spawn1, spawn2));
+        }
+
+        // Cargar configuraciones de kits
+        for (String kitName : config.getConfigurationSection("kits").getKeys(false)) {
+            List<ItemStack> items = new ArrayList<>();
+            for (String item : config.getStringList("kits." + kitName)) {
+                String[] parts = item.split(":");
+                Material material = Material.valueOf(parts[0]);
+                int amount = parts.length > 1 ? Integer.parseInt(parts[1]) : 1;
+                items.add(new ItemStack(material, amount));
+            }
+            kits.add(new Kit(kitName, items.toArray(new ItemStack[0])));
+        }
     }
 
     public List<Arena> getArenas() {
@@ -178,6 +230,10 @@ public class SkyPlugin extends JavaPlugin {
         return scoreboardManager;
     }
 
+    public PlayerLevel getPlayerLevel() {
+        return playerLevel;
+    }
+
     public Location getLobbyLocation() {
         return lobbyLocation;
     }
@@ -197,5 +253,9 @@ public class SkyPlugin extends JavaPlugin {
     public void sendWelcomeMessage(Player player) {
         player.sendMessage("¡Bienvenido a SkyWars, " + player.getName() + "!");
         player.sendMessage("Usa /join para unirte a un equipo y /selectkit para elegir tu kit.");
+    }
+
+    public boolean getEconomyManager() {
+        return false;
     }
 }

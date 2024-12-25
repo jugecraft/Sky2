@@ -41,3 +41,8 @@ kits:
   Miner:
     - IRON_PICKAXE
     - GOLDEN_APPLE:3
+
+shop:
+  DIAMOND_SWORD: 100
+  IRON_HELMET: 50
+  GOLDEN_APPLE: 30

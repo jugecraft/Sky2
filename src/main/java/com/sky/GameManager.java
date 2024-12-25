@@ -4,6 +4,7 @@ import com.sky.arenas.Arena;
 import com.sky.kits.Kit;
 import com.sky.teams.Team;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 
@@ -24,13 +25,23 @@ public class GameManager {
         this.gameActive = true;
         Bukkit.broadcastMessage("¡El juego de SkyWars ha comenzado!");
         // Teletransportar jugadores a sus puntos de aparición y darles sus kits
+        List<Location> bedrockLocations = arena.getBedrockLocations();
+        int index = 0;
         for (Team team : plugin.getTeams()) {
             for (Player player : team.getPlayers()) {
-                player.teleport(arena.getSpawn1());
+                if (index < bedrockLocations.size()) {
+                    Location spawnLoc = bedrockLocations.get(index);
+                    player.teleport(spawnLoc);
+                    index++;
+                } else {
+                    player.sendMessage("No hay suficientes puntos de aparición en esta arena.");
+                    player.teleport(arena.getSpawn1()); // Teletransportar a una ubicación alternativa
+                }
                 Kit kit = plugin.getPlayerKit(player);
                 if (kit != null) {
                     player.getInventory().clear();
                     player.getInventory().addItem(kit.getItems());
+                    kit.activatePowers(player); // Activar poderes del kit
                 }
             }
         }
