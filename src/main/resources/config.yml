@@ -1,0 +1,6 @@
+# Configuración de SkyWars
+game:
+  countdown: 10 # Duración de la cuenta regresiva en segundos
+  rewards:
+    kill: 10 # Puntos por eliminación
+    win: 50 # Puntos por ganar

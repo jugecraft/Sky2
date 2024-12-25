@@ -1,0 +1,9 @@
+name: Sky
+main: com.sky.SkyPlugin
+version: 1.0
+api-version: 1.8
+description: Un plugin de SkyWars desde cero.
+commands:
+  join:
+    description: Unirse a una partida de SkyWars.
+    usage: /join
