@@ -11,6 +11,7 @@ import com.sky.commands.LeaderboardCommand;
 import com.sky.gui.KitSelectionGUI;
 import com.sky.kits.Kit;
 import com.sky.teams.Team;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -34,6 +35,7 @@ public class SkyPlugin extends JavaPlugin {
     private StatisticsManager statisticsManager;
     private EventManager eventManager;
     private AchievementManager achievementManager;
+    private SkyScoreboardManager scoreboardManager; // Usar SkyScoreboardManager
     private Location lobbyLocation;
 
     @Override
@@ -54,6 +56,8 @@ public class SkyPlugin extends JavaPlugin {
         this.statisticsManager = new StatisticsManager(this);
         this.achievementManager = new AchievementManager(this);
         this.eventManager = new EventManager(this);
+        this.scoreboardManager = new SkyScoreboardManager(this); // Inicializar SkyScoreboardManager
+
         // Añadir ejemplo de arena
         arenas.add(new Arena("Arena1", new Location(getServer().getWorld("world"), 0, 64, 0), new Location(getServer().getWorld("world"), 100, 64, 100)));
         // Añadir ejemplos de kits
@@ -73,6 +77,16 @@ public class SkyPlugin extends JavaPlugin {
 
         // Activar eventos temporales
         eventManager.startLimitedTimeEvent();
+
+        // Actualizar el scoreboard cada 5 segundos
+        Bukkit.getScheduler().runTaskTimer(this, new Runnable() {
+            @Override
+            public void run() {
+                for (Player player : Bukkit.getOnlinePlayers()) {
+                    scoreboardManager.updateScoreboard(player);
+                }
+            }
+        }, 0L, 100L); // 100 ticks = 5 segundos
     }
 
     @Override
@@ -158,6 +172,10 @@ public class SkyPlugin extends JavaPlugin {
 
     public AchievementManager getAchievementManager() {
         return achievementManager;
+    }
+
+    public SkyScoreboardManager getScoreboardManager() {
+        return scoreboardManager;
     }
 
     public Location getLobbyLocation() {

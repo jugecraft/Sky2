@@ -4,7 +4,10 @@ import com.sky.arenas.Arena;
 import com.sky.kits.Kit;
 import com.sky.teams.Team;
 import org.bukkit.Bukkit;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
+
+import java.util.List;
 
 public class GameManager {
     private SkyPlugin plugin;
@@ -31,11 +34,17 @@ public class GameManager {
                 }
             }
         }
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            TitleManager.sendTitle(player, "¡El juego de SkyWars ha comenzado!", "", 10, 40, 10);
+        }
     }
 
     public void endGame() {
         this.gameActive = false;
         Bukkit.broadcastMessage("¡El juego de SkyWars ha terminado!");
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            TitleManager.sendTitle(player, "¡El juego de SkyWars ha terminado!", "", 10, 40, 10);
+        }
         // Limpiar el estado del juego
     }
 
@@ -47,6 +56,9 @@ public class GameManager {
             team.removePlayer(player);
             if (team.getPlayers().isEmpty()) {
                 Bukkit.broadcastMessage("El equipo " + team.getName() + " ha sido eliminado!");
+                for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+                    TitleManager.sendTitle(onlinePlayer, "Equipo Eliminado", "El equipo " + team.getName() + " ha sido eliminado", 10, 20, 10);
+                }
             }
         }
         // Verificar si queda algún equipo con jugadores
@@ -58,6 +70,10 @@ public class GameManager {
                     plugin.getStatisticsManager().incrementGamesWon(winner);
                     plugin.getRewardManager().addPoints(winner, plugin.getWinReward());
                 }
+                Bukkit.broadcastMessage("¡El equipo " + winningTeam.getName() + " ha ganado la partida!");
+                for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+                    TitleManager.sendTitle(onlinePlayer, "Partida Terminada", "¡El equipo " + winningTeam.getName() + " ha ganado la partida!", 10, 20, 10);
+                }
             }
         }
 
@@ -67,6 +83,9 @@ public class GameManager {
             plugin.getStatisticsManager().incrementKills(killer);
             plugin.getRewardManager().addPoints(killer, plugin.getKillReward());
             Bukkit.broadcastMessage(killer.getName() + " ha eliminado a " + player.getName() + "!");
+            for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+                TitleManager.sendTitle(onlinePlayer, "¡Eliminación!", killer.getName() + " ha eliminado a " + player.getName(), 10, 20, 10);
+            }
         }
     }
 
@@ -78,9 +97,17 @@ public class GameManager {
             public void run() {
                 if (countdown > 0) {
                     Bukkit.broadcastMessage("El juego comienza en " + countdown + " segundos.");
+                    for (Player player : Bukkit.getOnlinePlayers()) {
+                        TitleManager.sendTitle(player, "§e" + countdown, "", 10, 20, 10);
+                        player.playSound(player.getLocation(), Sound.NOTE_PLING, 1.0f, 1.0f);
+                    }
                     countdown--;
                 } else {
                     Bukkit.getScheduler().cancelTasks(plugin);
+                    for (Player player : Bukkit.getOnlinePlayers()) {
+                        TitleManager.sendTitle(player, "§a¡Comienza!", "", 10, 20, 10);
+                        player.playSound(player.getLocation(), Sound.ENDERDRAGON_GROWL, 1.0f, 1.0f);
+                    }
                     startGame(arena);
                 }
             }

@@ -2,7 +2,9 @@ package com.sky.commands;
 
 import com.sky.SkyPlugin;
 import com.sky.arenas.Arena;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -21,11 +23,21 @@ public class CreateArenaCommand implements CommandExecutor {
             Player player = (Player) sender;
             if (args.length > 0) {
                 String arenaName = args[0];
-                Location spawn1 = player.getLocation();
-                Location spawn2 = player.getLocation().clone().add(100, 0, 0); // Ejemplo
-                Arena arena = new Arena(arenaName, spawn1, spawn2);
-                plugin.getArenas().add(arena);
-                player.sendMessage("Arena " + arenaName + " creada.");
+                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "mv create " + arenaName + " normal -g VoidGenerator"); // Crear un mundo vacío con Multiverse-Core
+
+                Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                    World newWorld = Bukkit.getWorld(arenaName);
+                    if (newWorld != null) {
+                        Location spawn1 = new Location(newWorld, 0, 64, 0); // Punto de aparición en el nuevo mundo
+                        Location spawn2 = new Location(newWorld, 100, 64, 100); // Otro punto de aparición de ejemplo
+
+                        Arena arena = new Arena(arenaName, spawn1, spawn2);
+                        plugin.getArenas().add(arena);
+                        player.sendMessage("Arena " + arenaName + " y mundo creados.");
+                    } else {
+                        player.sendMessage("Error al crear el mundo para la arena.");
+                    }
+                }, 100L); // Esperar unos ticks para asegurarse de que el mundo se ha creado
             } else {
                 player.sendMessage("Por favor, especifica el nombre de la arena.");
             }

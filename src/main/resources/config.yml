@@ -1,6 +1,43 @@
-# Configuración de SkyWars
+# Configuración principal del plugin SkyWars
+
 game:
-  countdown: 10 # Duración de la cuenta regresiva en segundos
+  minPlayers: 4
+  countdown: 30 # Tiempo de cuenta regresiva en segundos
   rewards:
     kill: 10 # Puntos por eliminación
     win: 50 # Puntos por ganar
+
+lobby:
+  location:
+    world: world
+    x: 0
+    y: 70
+    z: 0
+
+arenas:
+  Arena1:
+    spawn1:
+      world: world
+      x: 0
+      y: 64
+      z: 0
+    spawn2:
+      world: world
+      x: 100
+      y: 64
+      z: 100
+
+kits:
+  Starter:
+    - STONE_SWORD
+    - APPLE:5
+  Archer:
+    - BOW
+    - ARROW:32
+    - LEATHER_HELMET
+  Warrior:
+    - IRON_SWORD
+    - IRON_CHESTPLATE
+  Miner:
+    - IRON_PICKAXE
+    - GOLDEN_APPLE:3

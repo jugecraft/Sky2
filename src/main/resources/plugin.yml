@@ -1,9 +1,50 @@
-name: Sky
+name: SkyWars
+version: 1.0.0
 main: com.sky.SkyPlugin
-version: 1.0
-api-version: 1.8
-description: Un plugin de SkyWars desde cero.
+author: TuNombre
+description: Un plugin de SkyWars para Minecraft
+
 commands:
   join:
-    description: Unirse a una partida de SkyWars.
-    usage: /join
+    description: Únete a un equipo
+    usage: /join <equipo>
+  createarena:
+    description: Crea una nueva arena
+    usage: /createarena <nombre>
+  startgame:
+    description: Inicia un juego en una arena
+    usage: /startgame <arena>
+  endgame:
+    description: Termina el juego actual
+    usage: /endgame
+  selectkit:
+    description: Selecciona un kit
+    usage: /selectkit <kit>
+  stats:
+    description: Muestra tus estadísticas o las de otro jugador
+    usage: /stats [jugador]
+  leaderboard:
+    description: Muestra la tabla de clasificación
+    usage: /leaderboard
+permissions:
+  skywars.join:
+    description: Permite al jugador unirse a un equipo
+    default: true
+  skywars.createarena:
+    description: Permite al jugador crear una arena
+    default: op
+  skywars.startgame:
+    description: Permite al jugador iniciar un juego
+    default: op
+  skywars.endgame:
+    description: Permite al jugador terminar un juego
+    default: op
+  skywars.selectkit:
+    description: Permite al jugador seleccionar un kit
+    default: true
+  skywars.stats:
+    description: Permite al jugador ver estadísticas
+    default: true
+  skywars.leaderboard:
+    description: Permite al jugador ver la tabla de clasificación
+    default: true

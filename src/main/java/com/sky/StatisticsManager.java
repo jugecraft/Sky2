@@ -34,11 +34,12 @@ public class StatisticsManager {
         loadStatistics();
     }
 
-    public void incrementGamesWon(Player player) {
+    public int getPlayerLevel(Player player) {
         PlayerStatistics stats = playerStatisticsMap.getOrDefault(player.getUniqueId(), new PlayerStatistics());
         stats.incrementGamesWon();
         playerStatisticsMap.put(player.getUniqueId(), stats);
         saveStatistics(player);
+        return 1;
     }
 
     public void incrementKills(Player player) {
